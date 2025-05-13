@@ -30,33 +30,47 @@ public class SignupServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        String username = req.getParameter("username").trim();
-        String password = req.getParameter("password");
+        // 1) Grab all form parameters
+        String username          = req.getParameter("username").trim();
+        String password          = req.getParameter("password");
+        String firstName         = req.getParameter("firstName").trim();
+        String lastName          = req.getParameter("lastName").trim();
+        String primaryContact    = req.getParameter("primaryContact").trim();
+        String secondaryContact  = req.getParameter("secondaryContact").trim();
+        String address           = req.getParameter("address").trim();
 
-        if (username.isEmpty() || password.isEmpty()) {
-            req.setAttribute("error", "Username and password are required.");
-            req.getRequestDispatcher("/signup.jsp").forward(req, resp);
+        // 2) Basic non-empty validation
+        if (username.isEmpty() || password.isEmpty() ||
+                firstName.isEmpty() || lastName.isEmpty() ||
+                primaryContact.isEmpty() || address.isEmpty()) {
+            req.setAttribute("error", "All fields except secondary contact are required.");
+            req.getRequestDispatcher("/WEB-INF/signup.jsp")
+                    .forward(req, resp);
             return;
         }
 
-        // Hash the password server-side with SHA-256
+        // 3) Hash the password
         String hash = sha256(password);
 
         try {
+            // 4) Create the customer record
             int newId = dao.createCustomer(
                     username,
                     hash,
-                    /* firstName */ "",
-                    /* lastName */ "",
-                    /* primaryContact */ "",
-                    /* address */ ""
+                    firstName,
+                    lastName,
+                    primaryContact,
+                    secondaryContact,
+                    address
             );
-            // signup successful → redirect to login
-            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+
+            // 5) Redirect to login on success
+            resp.sendRedirect(req.getContextPath() + "/login");
         } catch (SQLException e) {
-            // handle duplicate username, etc.
+            // e.g. duplicate username, DB error
             req.setAttribute("error", "Signup failed: " + e.getMessage());
-            req.getRequestDispatcher("/signup.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/signup.jsp")
+                    .forward(req, resp);
         }
     }
 

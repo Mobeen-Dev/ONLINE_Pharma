@@ -63,13 +63,14 @@ public class CustomerDAO {
                               String firstName,
                               String lastName,
                               String primaryContact,
+                              String secondaryContact,
                               String address) throws SQLException {
         String sql = """
             INSERT INTO customers
               (username, password_hash,
                first_name, last_name,
-               primary_contact, address)
-            VALUES (?, ?, ?, ?, ?, ?)
+               primary_contact, secondary_contact, address)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """;
         try (PreparedStatement ps =
                      connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -78,7 +79,8 @@ public class CustomerDAO {
             ps.setString(3, firstName);
             ps.setString(4, lastName);
             ps.setString(5, primaryContact);
-            ps.setString(6, address);
+            ps.setString(6, secondaryContact);
+            ps.setString(7, address);
             ps.executeUpdate();
             try (ResultSet keys = ps.getGeneratedKeys()) {
                 if (keys.next()) return keys.getInt(1);

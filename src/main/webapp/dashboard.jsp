@@ -19,28 +19,61 @@
   <title>Your Dashboard</title>
   <style>
     body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; }
-    header { display: flex; justify-content: space-between; align-items: center; }
+
     .btn { padding: .5rem 1rem; background: #0077cc; color: #fff; text-decoration: none; border-radius:4px; }
     table { width:100%; border-collapse: collapse; margin-top:1rem; }
     th, td { border:1px solid #ccc; padding:.5rem; text-align:left; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      padding: 1rem;
+      background: #fff;
+    }
+    .user-info {
+      flex: 1 1 300px;      /* grow, shrink, base width */
+      min-width: 200px;
+    }
+    .user-info h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    .user-info p {
+      margin: .5rem 0 0;
+      word-wrap: break-word; /* break very long addresses */
+      max-width: 600px;
+    }
+    .actions {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      margin-top: .5rem;
+    }
+    .actions .btn {
+      padding: .5rem 1rem;
+      text-decoration: none;
+      background: #007bff;
+      color: #fff;
+      border-radius: 4px;
+    }
+    .actions .btn.logout {
+      background: #d9534f;
+    }
     th { background: #f0f0f0; }
   </style>
 </head>
 <body>
 
 <header>
-  <div>
+  <div class="user-info">
     <h1>Welcome, <%= customer.getFirstName() %> <%= customer.getLastName() %></h1>
     <p>Address: <%= customer.getAddress() %></p>
   </div>
-  <a href="<%= request.getContextPath() %>/order" class="btn">Continue Shopping</a>
-  <nav>
+  <nav class="actions">
+    <a href="<%= request.getContextPath() %>/order" class="btn">Continue Shopping</a>
     <a href="<%= request.getContextPath() %>/manage" class="btn">Manage Medicine</a>
-    <!-- Logout button -->
-    <a href="<%= request.getContextPath() %>/logout" class="btn"
-       style="background:#d9534f; margin-left:1rem;">
-      Logout
-    </a>
+    <a href="<%= request.getContextPath() %>/logout" class="btn logout">Logout</a>
   </nav>
 </header>
 

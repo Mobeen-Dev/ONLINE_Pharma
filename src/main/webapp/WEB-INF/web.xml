@@ -72,6 +72,16 @@
     <url-pattern>/order</url-pattern>
   </servlet-mapping>
 
+  <!-- PlaceOrderServlet -->
+  <servlet>
+    <servlet-name>OnlineStore</servlet-name>
+    <servlet-class>com.pharmacy.servlet.OnlineStore</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OnlineStore</servlet-name>
+    <url-pattern>/store</url-pattern>
+  </servlet-mapping>
+
   <!-- OrderConfirmationServlet -->
   <servlet>
     <servlet-name>OrderConfirmationServlet</servlet-name>

@@ -1,11 +1,10 @@
 package com.pharmacy.dao;
 
 import com.pharmacy.model.Medicine;
-
+import java.util.stream.Collectors;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class MedicineDAO {
     private Connection connection;
@@ -142,4 +141,6 @@ public class MedicineDAO {
                 rs.getInt("stock")
         );
     }
+
+
 }
