@@ -72,13 +72,14 @@ public class OnlineStore extends HttpServlet {
         /* ------------------------------------------------------------------ *
          * 1 . identify customer (fall back to anonymous ID 1)                 *
          * ------------------------------------------------------------------ */
+        System.out.println("DEBUG: Arrived in doPost function  ");
         HttpSession session = req.getSession();
         int customerId = Optional.ofNullable((Integer) session.getAttribute("customerId"))
                 .orElseGet(() -> {
                     session.setAttribute("customerId", 1);
                     return 1;
                 });
-
+        System.out.println("DEBUG:CustomerID ->  "+customerId);
         /* ------------------------------------------------------------------ *
          * 2 . collect quantities:  qty_123 → 3  ⇒  {123=3}                    *
          * ------------------------------------------------------------------ */
@@ -88,6 +89,8 @@ public class OnlineStore extends HttpServlet {
                     try {
                         int medId = Integer.parseInt(e.getKey().substring(4));
                         int qty   = Integer.parseInt(e.getValue()[0].trim());
+                        System.out.println("DEBUG: medId ->  "+medId);
+                        System.out.println("DEBUG: qty ->  "+qty);
                         return Map.entry(medId, qty);
                     } catch (NumberFormatException nfe) {   // skip garbage parameters
                         return null;
@@ -140,7 +143,8 @@ public class OnlineStore extends HttpServlet {
          * ------------------------------------------------------------------ */
         if (qtyMap.isEmpty()) {
             if (errors.isEmpty()) {
-                errors.add("Your cart is empty. Please add at least one item.");
+                System.out.println("DEBUG: Your cart is empty. Please add at least one item. ");
+                errors.add("empty cart");
             }
             req.setAttribute("error", String.join("<br>", errors));
             doGet(req, res);
@@ -160,12 +164,14 @@ public class OnlineStore extends HttpServlet {
             totalPrice  = totalPrice.add(m.getPrice().multiply(BigDecimal.valueOf(qty)));
         }
 
+        System.out.println("DEBUG: Your cart Price : "+totalPrice);
+
         /* ------------------------------------------------------------------ *
          * 6 . persist – one transaction, explicit rollback on failure        *
          * ------------------------------------------------------------------ */
         int orderId;
         try (Connection conn = orderDao.getConnection()) {
-            conn.setAutoCommit(false);        // begin TX
+            conn.setAutoCommit(true);        // begin TX
             try {
                 orderId = orderDao.createOrder(conn, customerId, totalItems, totalPrice);
                 for (Map.Entry<Integer,Integer> e : qtyMap.entrySet()) {
@@ -174,12 +180,14 @@ public class OnlineStore extends HttpServlet {
                     orderDao.addLineItem(conn, orderId, m.getId(), qty, m.getPrice());
                     medDao.updateStock(m.getId(), m.getStock() - qty);
                 }
-                conn.commit();               // success
+//                conn.commit();               // success
             } catch (SQLException ex) {
-                conn.rollback();             // restore DB
+//                conn.rollback();             // restore DB
                 throw ex;
             }
         } catch (SQLException ex) {
+            System.out.println("DEBUG: Order placement failed"+ ex);
+
             throw new ServletException("Order placement failed", ex);
         }
 
